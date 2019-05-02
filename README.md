@@ -107,11 +107,11 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | How can we represent the system in an **architecture diagram**, which gives information both about the Docker containers, the communication protocols and the commands? |
 | | *Insert your diagram here...* |
 |Question | Who is going to **send UDP datagrams** and **when**? |
-| | *Enter your response here...* |
+| | *UDP datagrams are sent by musicians every second on a multicast group. This group has the following IP address and port : 239.255.22.5 9907* |
 |Question | Who is going to **listen for UDP datagrams** and what should happen when a datagram is received? |
-| | *Enter your response here...* |
+| | *Auditors are listening for UDP datagrams after joining the multicast group. Once received, the datagram is used to fill an array keeping up track of active musicians. A musician is considered active if he has sent a sound within the 5 last seconds.* |
 |Question | What **payload** should we put in the UDP datagrams? |
-| | *Enter your response here...* |
+| | *The UDP datagrams payloads must contain the UUID of the musician and the sound emitted by his instrument.* |
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
 | | *Enter your response here...* |
 
