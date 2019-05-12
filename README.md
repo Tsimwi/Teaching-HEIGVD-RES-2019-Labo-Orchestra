@@ -109,11 +109,11 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | Who is going to **send UDP datagrams** and **when**? |
 | | *UDP datagrams are sent by musicians every second on a multicast group. This group has the following IP address and port : 239.255.22.5 9907* |
 |Question | Who is going to **listen for UDP datagrams** and what should happen when a datagram is received? |
-| | *Auditors are listening for UDP datagrams after joining the multicast group. Once received, the datagram is used to fill an array keeping up track of active musicians. A musician is considered active if he has sent a sound within the 5 last seconds.* |
+| | *Auditors are listening for UDP datagrams after joining the multicast group. Once received, the datagram is parsed and the information it contains are saved in a hashmap (key : uuid, value : musician).* |
 |Question | What **payload** should we put in the UDP datagrams? |
-| | *The UDP datagrams payloads must contain the UUID of the musician and the sound emitted by his instrument.* |
+| | *The UDP datagrams payloads must contain the UUID of the musician and the sound emitted by his instrument., and the timestamp.* |
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
-| | *We need hash maps to store {key,value} pairs and also an array to store active musicians.<br />Auditor : its hash map is updated every time it receives a new datagram. Concerning it's array, it is queried and updated every time a TCP connection is made.<br />Musician : its hash map is only created once with {instrument, sound} then never modified. It is queried every time a datagram must be sent.* |
+| | *We need hash maps to store {instrument,sound} pairs and also an hashmap to store active musicians.<br />Auditor : its hash map is updated every time it receives a new datagram. Every time a TCP client opens a connection with the auditor, the hash map is also updated if a musician has not emitted a sound lately. Then, a new hash map with active musicians is created and sent to the client.<br />Musician : its hash map is only created once with {instrument, sound} then never modified. It is queried every time a datagram must be sent.* |
 
 
 ## Task 2: implement a "musician" Node.js application
@@ -143,17 +143,17 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | How do we **define and build our own Docker image**?|
-| | *Enter your response here...*  |
+| | *By creating a Dockerfile, then using `docker build -t imageName` command.* |
 |Question | How can we use the `ENTRYPOINT` statement in our Dockerfile?  |
-| | *Enter your response here...*  |
+| | *Entrypoint represents the first command to be executed once the container is started. So we only have to give it the path of the javascript file.* |
 |Question | After building our Docker image, how do we use it to **run containers**?  |
-| | *Enter your response here...*  |
+| | *We can use `docker run -d imageName [instrument]` command.* |
 |Question | How do we get the list of all **running containers**?  |
-| | *Enter your response here...*  |
+| | *We can use `docker ps` command.* |
 |Question | How do we **stop/kill** one running container?  |
-| | *Enter your response here...*  |
+| | *We can use `docker stop/kill containerName` command.* |
 |Question | How can we check that our running containers are effectively sending UDP datagrams?  |
-| | *Enter your response here...*  |
+| | *We can use `docker exec -it containerName /bin/bash` command. |
 
 
 ## Task 4: implement an "auditor" Node.js application
@@ -165,7 +165,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | How can we use the `Map` built-in object introduced in ECMAScript 6 to implement a **dictionary**?  |
 | | *We can first declare a Map, then use `Map.set` to add {key,value} pairs.<br />`var instruments = new Map(); instruments.set("piano", "ti-ta-ti");`* |
 |Question | How can we use the `Moment.js` npm module to help us with **date manipulations** and formatting?  |
-| | *Enter your response here...* |
+| | *Moment objects can be created with `Moment()` and then compared with the `diff` method.* |
 |Question | When and how do we **get rid of inactive players**?  |
 | | *When : every time a TCP connection is opened. How : by comparing current time with saved timestamp and removing every musician from which the auditor did't receive a sound since more than 5 seconds.* |
 |Question | How do I implement a **simple TCP server** in Node.js?  |
@@ -177,7 +177,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | How do we validate that the whole system works, once we have built our Docker image? |
-| | *By running the following script : `validate.sh`* |
+| | *By running the following script : `validate.sh`. Or we can also run our containers, open a TCP connection with the auditor, kill the musician then reopen a connection with the auditor five seconds later.* |
 
 
 ## Constraints
