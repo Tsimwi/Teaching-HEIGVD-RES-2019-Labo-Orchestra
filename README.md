@@ -113,7 +113,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | What **payload** should we put in the UDP datagrams? |
 | | *The UDP datagrams payloads must contain the UUID of the musician and the sound emitted by his instrument.* |
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
-| | *Enter your response here...* |
+| | *We need hash maps to store {key,value} pairs and also an array to store active musicians.<br />Auditor : its hash map is updated every time it receives a new datagram. Concerning it's array, it is queried and updated every time a TCP connection is made.<br />Musician : its hash map is only created once with {instrument, sound} then never modified. It is queried every time a datagram must be sent.* |
 
 
 ## Task 2: implement a "musician" Node.js application
@@ -121,21 +121,21 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | In a JavaScript program, if we have an object, how can we **serialize it in JSON**? |
-| | *Enter your response here...*  |
+| | *With the following command : `JSON.stringify(object);`* |
 |Question | What is **npm**?  |
-| | *Enter your response here...*  |
+| | *Node Package Manager is a software registry that contains JavaScript node packages.* |
 |Question | What is the `npm install` command and what is the purpose of the `--save` flag?  |
-| | *Enter your response here...*  |
+| | *This command imports a new package into the current project (node_module library). The `--save` flag adds the package in package.json file.* |
 |Question | How can we use the `https://www.npmjs.com/` web site?  |
-| | *Enter your response here...*  |
+| | *When we need a specific package, we can type its name in the search bar. Then we can choose among a lot of different packages suiting our needs.* |
 |Question | In JavaScript, how can we **generate a UUID** compliant with RFC4122? |
-| | *Enter your response here...*  |
+| | *We can use the **uuid** package. We just need to import it then generates a UUID.<br />`const uuidv4 = require('uuid/v4');`<br />`uuid = uuidv4();`* |
 |Question | In Node.js, how can we execute a function on a **periodic** basis? |
-| | *Enter your response here...*  |
+| | *With the following function : `setInterval(this.update.bind(object), milliseconds);`* |
 |Question | In Node.js, how can we **emit UDP datagrams**? |
-| | *Enter your response here...*  |
+| | *After creating the datagram, we can send it using the previously opened socket.<br />`let s = dgram.createSocket('udp4');`<br />`s.send(...)`* |
 |Question | In Node.js, how can we **access the command line arguments**? |
-| | *Enter your response here...*  |
+| | *We can use the following command : `process.argv[i];` to access the i-h argument.* |
 
 
 ## Task 3: package the "musician" app in a Docker image
@@ -161,15 +161,15 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | ---  |
 |Question | With Node.js, how can we listen for UDP datagrams in a multicast group? |
-| | *Enter your response here...*  |
+| | *We have to create a socket then join the desired multicast group.<br />`const socket = dgram.createSocket('udp4'); socket.bind(protocol.PROTOCOL_PORT, function() { console.log("Joining multicast group");     socket.addMembership(protocol.PROTOCOL_MULTICAST_ADDRESS); });`* |
 |Question | How can we use the `Map` built-in object introduced in ECMAScript 6 to implement a **dictionary**?  |
-| | *Enter your response here...* |
+| | *We can first declare a Map, then use `Map.set` to add {key,value} pairs.<br />`var instruments = new Map(); instruments.set("piano", "ti-ta-ti");`* |
 |Question | How can we use the `Moment.js` npm module to help us with **date manipulations** and formatting?  |
 | | *Enter your response here...* |
 |Question | When and how do we **get rid of inactive players**?  |
-| | *Enter your response here...* |
+| | *When : every time a TCP connection is opened. How : by comparing current time with saved timestamp and removing every musician from which the auditor did't receive a sound since more than 5 seconds.* |
 |Question | How do I implement a **simple TCP server** in Node.js?  |
-| | *Enter your response here...* |
+| | *We first create a TCP server with `const server = net.createServer();` command. Then we make it react on listening and on connection : <br />`server.on('listening', callbackFunctionToCallWhenSocketIsBound); server.on('connection', callbackFunctionToCallWhenNewClientHasArrived);`<br /> Then, we make it listen on port 2205 : `server.listen(2205)`* |
 
 
 ## Task 5: package the "auditor" app in a Docker image
@@ -177,7 +177,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | How do we validate that the whole system works, once we have built our Docker image? |
-| | *Enter your response here...* |
+| | *By running the following script : `validate.sh`* |
 
 
 ## Constraints
