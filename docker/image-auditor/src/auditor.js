@@ -18,18 +18,17 @@ const protocol = require('./auditor-protocol');
  * We use a standard Node.js module to work with UDP
  */
 const dgram = require('dgram');
+const moment = require('moment');
 const net = require('net');
 
 const HashMap = require('hashmap');
-let map = new HashMap();
-let sound = new HashMap();
+var map = new HashMap();
+var sound = new HashMap();
 sound.set("ti-ta-ti", "piano");
 sound.set("pouet", "trumpet");
 sound.set("trulu", "flute");
 sound.set("gzi-gzi", "violin");
 sound.set("boum-boum", "drum");
-
-const moment = require('moment');
 
 // let's create a TCP server
 const server = net.createServer();
@@ -41,7 +40,7 @@ server.on('listening', callbackFunctionToCallWhenSocketIsBound);
 server.on('connection', callbackFunctionToCallWhenNewClientHasArrived);
 
 //Start listening on port 2205
-server.listen(2205);
+server.listen(protocol.PROTOCOL_PORT);
 
 // This callback is called when the socket is bound and is in
 // listening mode. We don't need to do anything special.
@@ -55,7 +54,7 @@ function callbackFunctionToCallWhenSocketIsBound() {
 function callbackFunctionToCallWhenNewClientHasArrived(socket) {
 
     console.log("A new TCP client has arrived : " + socket.address().address);
-    let activeMusicians = [];
+    var activeMusicians = [];
 
     map.forEach(function(value, key) {
         if (!(moment().diff(moment(value.activeSince), "seconds") <= 5)) {
@@ -78,7 +77,7 @@ function callbackFunctionToCallWhenNewClientHasArrived(socket) {
  * multicast group by thermometers and containing measures
  */
 const socket = dgram.createSocket('udp4');
-socket.bind(protocol.PROTOCOL_PORT, function() {
+socket.bind(protocol.PROTOCOL_MULTICAST_PORT, function() {
     console.log("Joining multicast group");
     socket.addMembership(protocol.PROTOCOL_MULTICAST_ADDRESS);
 });
@@ -94,7 +93,7 @@ function Musician(uuid, instrument, activeSince) {
  */
 socket.on('message', function(msg, source) {
     console.log("Data has arrived: " + msg + ". Source port: " + source.port);
-    let object = JSON.parse(msg);
-    let musician = new Musician(object.uuid, sound.get(object.sound), object.timestamp);
+    var object = JSON.parse(msg);
+    var musician = new Musician(object.uuid, sound.get(object.sound), object.timestamp);
     map.set(object.uuid, musician);
 });

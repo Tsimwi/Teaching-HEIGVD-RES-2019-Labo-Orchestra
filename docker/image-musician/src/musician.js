@@ -11,30 +11,21 @@
  Sources : RES course (thermometer lab)
 */
 
-const protocol = require('./auditor-protocol');
+const protocol = require('./musician-protocol');
 
-/*
- * We use a standard Node.js module to work with UDP
- */
+/* We use a standard Node.js module to work with UDP */
 const dgram = require('dgram');
-
+const uuidv4 = require('uuid/v4');
 const moment = require('moment');
 
-/*
- * Let's create a datagram socket. We will use it to send our UDP datagrams
- */
-let s = dgram.createSocket('udp4');
-
-/*
- * Generates random uuid value
- */
-const uuidv4 = require('uuid/v4');
+/* Let's create a datagram socket. We will use it to send our UDP datagrams */
+var s = dgram.createSocket('udp4');
 
 /*
  * We'll use hashmaps to store key/value pairs (instrument/sound)
  */
 const HashMap = require('hashmap');
-let map = new HashMap();
+var map = new HashMap();
 map.set("piano", "ti-ta-ti");
 map.set("trumpet", "pouet");
 map.set("flute", "trulu");
@@ -57,12 +48,12 @@ function Musician(instrument) {
          * and serialize the object to a JSON string
          */
 
-        let sound = {
+        var sound = {
             uuid: this.uuid,
             sound: map.get(this.instrument),
             timestamp: moment()
     };
-        let payload = JSON.stringify(sound);
+        var payload = JSON.stringify(sound);
 
         /*
          * Finally, let's encapsulate the payload in a UDP datagram, which we publish on
@@ -70,27 +61,27 @@ function Musician(instrument) {
          */
         message = new Buffer(payload);
 
-        s.send(message, 0, message.length, protocol.PROTOCOL_PORT, protocol.PROTOCOL_MULTICAST_ADDRESS, function (err, bytes) {
+        s.send(message, 0, message.length, protocol.PROTOCOL_MULTICAST_PORT, protocol.PROTOCOL_MULTICAST_ADDRESS, function (err, bytes) {
             console.log("Sending payload: " + payload + " via port " + s.address().port);
         });
 
     }
 
     /*
-     * Let's take and send a measure every 1000 ms
+     * Let's take and send a sound every 1000 ms
      */
     setInterval(this.update.bind(this), 1000);
 
 }
 
 /*
- * Let's get the thermometer properties from the command line attributes
+ * Let's get the musician properties from the command line attributes
  * Some error handling wouldn't hurt here...
  */
-let instrument = process.argv[2];
+var instrument = process.argv[2];
 
 /*
  * Let's create a new musician - the regular publication of sounds will
  * be initiated within the constructor
  */
-let m1 = new Musician(instrument);
+new Musician(instrument);

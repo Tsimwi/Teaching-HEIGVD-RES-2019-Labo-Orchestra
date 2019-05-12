@@ -1,7 +1,6 @@
 FROM node:4.3.1
 
-COPY ../../src/musician.js /opt/app/
-COPY ../../package.json /opt/app/
+COPY src /opt/app/
 
 WORKDIR /opt/app/
 RUN npm install
