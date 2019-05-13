@@ -109,11 +109,11 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | Who is going to **send UDP datagrams** and **when**? |
 | | *UDP datagrams are sent by musicians every second on a multicast group. This group has the following IP address and port : 239.255.22.5 9907* |
 |Question | Who is going to **listen for UDP datagrams** and what should happen when a datagram is received? |
-| | *Auditors are listening for UDP datagrams after joining the multicast group. Once received, the datagram is parsed and the information it contains are saved in a hashmap (key : uuid, value : musician).* |
+| | *Auditors are listening for UDP datagrams after joining the multicast group. Once received, the datagram is parsed and the information it contains are saved in a hashmap (key : uuid, value : Musician(uuid, instrument, activeSince)).* |
 |Question | What **payload** should we put in the UDP datagrams? |
 | | *The UDP datagrams payloads must contain the UUID of the musician and the sound emitted by his instrument., and the timestamp.* |
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
-| | *We need hash maps to store {instrument,sound} pairs and also an hashmap to store active musicians.<br />Auditor : its hash map is updated every time it receives a new datagram. Every time a TCP client opens a connection with the auditor, the hash map is also updated if a musician has not emitted a sound lately. Then, a new hash map with active musicians is created and sent to the client.<br />Musician : its hash map is only created once with {instrument, sound} then never modified. It is queried every time a datagram must be sent.* |
+| | *We need (hash) maps to store {instrument,sound} pairs and also an hash map to store active musicians.<br />Auditor : its hash map is updated every time it receives a new datagram. Every time a TCP client opens a connection with the auditor, the hash map is also updated if a musician has not emitted a sound lately. Then, a new hash map with active musicians is created and sent to the client.<br />Musician : its hash map is only created once with {instrument, sound} then never modified. It is queried every time a datagram must be sent.* |
 
 
 ## Task 2: implement a "musician" Node.js application
