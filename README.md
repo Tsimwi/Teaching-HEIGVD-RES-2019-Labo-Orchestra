@@ -113,7 +113,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | What **payload** should we put in the UDP datagrams? |
 | | *The UDP datagrams payloads must contain the UUID of the musician and the sound emitted by his instrument., and the timestamp.* |
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
-| | *We need (hash) maps to store {instrument,sound} pairs and also an hash map to store active musicians.<br />Auditor : its hash map is updated every time it receives a new datagram. Every time a TCP client opens a connection with the auditor, the hash map is also updated if a musician has not emitted a sound lately. Then, a new hash map with active musicians is created and sent to the client.<br />Musician : its hash map is only created once with {instrument, sound} then never modified. It is queried every time a datagram must be sent.* |
+| | *We need (hash) maps to store {instrument,sound} pairs and also an hash map to store active musicians.<br />Auditor : its {uuid, Musician} hash map is updated every time it receives a new datagram. While parsing the payload, it queries the {sound, instrument} hash map. Every time a TCP client opens a connection with the auditor, the {uuid, Musician} hash map is also updated if a musician has not emitted a sound lately. Then, a new hash map with active musicians is created and sent to the client.<br />Musician : its {sound, instrument} hash map is only created once then never modified. It is queried every time a datagram has to be sent.* |
 
 
 ## Task 2: implement a "musician" Node.js application
@@ -129,13 +129,13 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | How can we use the `https://www.npmjs.com/` web site?  |
 | | *When we need a specific package, we can type its name in the search bar. Then we can choose among a lot of different packages suiting our needs.* |
 |Question | In JavaScript, how can we **generate a UUID** compliant with RFC4122? |
-| | *We can use the **uuid** package. We just need to import it then generates a UUID.<br />`const uuidv4 = require('uuid/v4');`<br />`uuid = uuidv4();`* |
+| | *We can use the **uuid** package. We just need to `npm install` it, import it in the javascript file then generates an UUID.<br />`const uuidv4 = require('uuid/v4');`<br />`uuid = uuidv4();`* |
 |Question | In Node.js, how can we execute a function on a **periodic** basis? |
 | | *With the following function : `setInterval(this.update.bind(object), milliseconds);`* |
 |Question | In Node.js, how can we **emit UDP datagrams**? |
 | | *After creating the datagram, we can send it using the previously opened socket.<br />`let s = dgram.createSocket('udp4');`<br />`s.send(...)`* |
 |Question | In Node.js, how can we **access the command line arguments**? |
-| | *We can use the following command : `process.argv[i];` to access the i-h argument.* |
+| | *We can use the following command : `process.argv[i];` to access the i-h argument (0 = node, 1 = program name).* |
 
 
 ## Task 3: package the "musician" app in a Docker image
@@ -143,17 +143,17 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | How do we **define and build our own Docker image**?|
-| | *By creating a Dockerfile, then using `docker build -t imageName` command.* |
+| | *By creating a Dockerfile, then using `docker build -t res/name .` command from the Dockerfile directory.* |
 |Question | How can we use the `ENTRYPOINT` statement in our Dockerfile?  |
-| | *Entrypoint represents the first command to be executed once the container is started. So we only have to give it the path of the javascript file.* |
+| | *Entrypoint represents the first command to be executed once the container is started. So we only have to give it the path of the previously copied javascript file.* |
 |Question | After building our Docker image, how do we use it to **run containers**?  |
-| | *We can use `docker run -d imageName [instrument]` command.* |
+| | *We can use `docker run -d (-p 9998:2205) res/name (instrument)` command.* |
 |Question | How do we get the list of all **running containers**?  |
 | | *We can use `docker ps` command.* |
 |Question | How do we **stop/kill** one running container?  |
 | | *We can use `docker stop/kill containerName` command.* |
 |Question | How can we check that our running containers are effectively sending UDP datagrams?  |
-| | *We can use `docker exec -it containerName /bin/bash` command. |
+| | *We can use `docker logs containerName` command. |
 
 
 ## Task 4: implement an "auditor" Node.js application
